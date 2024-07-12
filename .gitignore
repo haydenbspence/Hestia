@@ -1,6 +1,6 @@
 notebooks/
 data/*
-
+config.toml
 .ruff_cache
 
 # Byte-compiled / optimized / DLL files
