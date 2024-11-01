@@ -1,33 +1,93 @@
 {
-    "name": "Python 3.11 & Jupyter with Ruff",
-    "image": "mcr.microsoft.com/vscode/devcontainers/python:3.11",
-    "settings": {
-        "terminal.integrated.shell.linux": "/bin/bash",
-        "python.pythonPath": "/usr/local/bin/python",
-        "python.linting.enabled": true,
-        // Disable other linters to ensure ruff is the primary linter
-        "python.linting.pylintEnabled": false,
-        "python.linting.flake8Enabled": false,
-        // Configure ruff settings
-        "python.linting.ruffEnabled": true,
-        "python.linting.ruffPath": "/usr/local/bin/ruff",
-        "python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
-        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-        "python.formatting.yapfPath": "/usr/local/py-utils/bin/yapf",
-        "python.sortImports.path": "/usr/local/py-utils/bin/isort",
-        "[python]": {
-            "editor.codeActionsOnSave": {
-                "source.organizeImports": true
-            }
+    "name": "OMOP CDM Analysis Environment",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "MOTHERDUCK_TOKEN": "${localEnv:MOTHERDUCK_TOKEN}"
         }
     },
+    "workspaceFolder": "/workspace",
+
+    "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+            "bash": {
+                "path": "/bin/bash"
+            }
+        },
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        
+        // Ruff configuration
+        "python.linting.ruffEnabled": true,
+        "python.linting.ruffPath": "/usr/local/bin/ruff",
+        "[python]": {
+            "editor.defaultFormatter": "charliermarsh.ruff",
+            "editor.formatOnSave": true,
+            "editor.codeActionsOnSave": {
+                "source.organizeImports": true,
+                "source.fixAll": true
+            }
+        },
+
+        // Quarto settings
+        "quarto.render.previewType": "internal"
+    },
+
+    "remoteEnv": {
+        "MOTHERDUCK_TOKEN": "${localEnv:MOTHERDUCK_TOKEN}"
+    },
+
     "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-toolsai.jupyter",
-        "charliermarsh.ruff"
+        "charliermarsh.ruff",
+        "quarto.quarto",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens",
+        "ms-python.black-formatter",
+        "tamasfe.even-better-toml",
+        "ms-python.isort"
     ],
-    "forwardPorts": [8888],
-    "postCreateCommand": "pip install -r requirements.txt && pip install ruff",
-    "remoteUser": "vscode"
+
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.11"
+        },
+        "ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
+            "version": "1.4"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts"
+        }
+    },
+
+    "forwardPorts": [
+        8888,  // Jupyter
+        8000   // FastAPI
+    ],
+
+    "postCreateCommand": "pip install --user -r requirements.txt",
+
+    "remoteUser": "vscode",
+
+    // Mount SSH keys and local configuration
+    "mounts": [
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.motherduck,target=/home/vscode/.motherduck,type=bind,consistency=cached"
+    ],
+
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.testing.pytestEnabled": true,
+                "python.testing.unittestEnabled": false,
+                "python.testing.nosetestsEnabled": false,
+                "python.testing.pytestArgs": [
+                    "tests"
+                ]
+            }
+        }
+    }
 }
