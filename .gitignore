@@ -1,6 +1,7 @@
 notebooks/
 data/*
 
+hestia_old
 .ruff_cache
 
 # Byte-compiled / optimized / DLL files
